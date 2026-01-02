@@ -8,10 +8,12 @@
 #include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "kismet/GameplayStatics.h"
+#include "OnlineSubsystem.h"
+#include "OnlineSessionSettings.h"
 #include "MyFPS.h"
 
-AMyFPSCharacter::AMyFPSCharacter()
+AMyFPSCharacter::AMyFPSCharacter():
+	CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete))
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
@@ -43,6 +45,23 @@ AMyFPSCharacter::AMyFPSCharacter()
 	// Configure character movement
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 	GetCharacterMovement()->AirControl = 0.5f;
+
+	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get();
+	if (OnlineSubsystem)
+	{
+		OnlineSubsystem->GetSessionInterface();
+
+		//Debug log
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(
+				-1, 
+				15.f, 
+				FColor::Green,
+				FString::Printf(TEXT("Found Online Subsystem: %s"), 
+				*OnlineSubsystem->GetSubsystemName().ToString()));
+		}
+	}
 }
 
 void AMyFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -120,25 +139,57 @@ void AMyFPSCharacter::DoJumpEnd()
 	StopJumping();
 }
 
-void AMyFPSCharacter::OpenLobby()
+void AMyFPSCharacter::CreateGameSession()
 {
-	UWorld* World = GetWorld();
-	if (World)
+	if (!OnlineSessionInterface.IsValid())
 	{
-		World->ServerTravel(TEXT("/Game/FirstPerson/Maps/Lobby?listen"));
+		return;
+	} 
+	auto ExistingSession = OnlineSessionInterface->GetNamedSession(NAME_GameSession);
+	if (ExistingSession != nullptr)
+	{
+		OnlineSessionInterface->DestroySession(NAME_GameSession);
 	}
+
+	OnlineSessionInterface->AddOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegate);
+
+	TSharedPtr<FOnlineSessionSettings>SessionSettings=MakeShareable(new FOnlineSessionSettings());
+
+	SessionSettings->bIsLANMatch = false;
+	SessionSettings->NumPublicConnections = 4;
+	SessionSettings->bAllowJoinInProgress = true;
+	SessionSettings->bAllowJoinViaPresence = true;
+	SessionSettings->bShouldAdvertise = true;
+	SessionSettings->bUsesPresence = true;
+
+	const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
+	OnlineSessionInterface->CreateSession(*LocalPlayer->GetPreferredUniqueNetId(),NAME_GameSession,*SessionSettings);
 }
 
-void AMyFPSCharacter::CallOpenLevel(const FString& address)
+void AMyFPSCharacter::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful)
 {
-	UGameplayStatics::OpenLevel(this, FName(*address));
-}
-
-void AMyFPSCharacter::CallClientTravel(const FString& address)
-{
-	APlayerController* PlayController = GetGameInstance()->GetFirstLocalPlayerController();
-	if (PlayController)
+	if (bWasSuccessful)
 	{
-		PlayController->ClientTravel(address, ETravelType::TRAVEL_Absolute);
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				15.f,
+				FColor::Blue,
+				FString::Printf(TEXT("create session:%s"),*SessionName.ToString())
+			);
+		}
+	}
+	else
+	{
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				15.f,
+				FColor::Red,
+				FString(TEXT("Failed to create session!"))
+			);
+		}
 	}
 }

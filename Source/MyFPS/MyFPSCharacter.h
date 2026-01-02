@@ -5,7 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+#include "Interfaces/OnlineSessionInterface.h"
 #include "MyFPSCharacter.generated.h"
+
 
 class UInputComponent;
 class USkeletalMeshComponent;
@@ -90,14 +92,20 @@ public:
 	/** Returns first person camera component **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 
-	UFUNCTION(BlueprintCallable)
-	void OpenLobby();
+public:
+	//Pointer to the online session interface
+	IOnlineSessionPtr OnlineSessionInterface;
+	//TSharedPtr<class IOnlineSession, ESPMode::ThreadSafe> OnlineSessionInterface;
+
+protected:
 
 	UFUNCTION(BlueprintCallable)
-	void CallOpenLevel(const FString& address);
+	void CreateGameSession();
 
-	UFUNCTION(BlueprintCallable)
-	void CallClientTravel(const FString& address);
+	void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);
 
+private:
+
+	FOnCreateSessionCompleteDelegate CreateSessionCompleteDelegate;
 };
 
