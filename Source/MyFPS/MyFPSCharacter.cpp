@@ -8,6 +8,7 @@
 #include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "kismet/GameplayStatics.h"
 #include "MyFPS.h"
 
 AMyFPSCharacter::AMyFPSCharacter()
@@ -117,4 +118,27 @@ void AMyFPSCharacter::DoJumpEnd()
 {
 	// pass StopJumping to the character
 	StopJumping();
+}
+
+void AMyFPSCharacter::OpenLobby()
+{
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		World->ServerTravel(TEXT("/Game/FirstPerson/Maps/Lobby?listen"));
+	}
+}
+
+void AMyFPSCharacter::CallOpenLevel(const FString& address)
+{
+	UGameplayStatics::OpenLevel(this, FName(*address));
+}
+
+void AMyFPSCharacter::CallClientTravel(const FString& address)
+{
+	APlayerController* PlayController = GetGameInstance()->GetFirstLocalPlayerController();
+	if (PlayController)
+	{
+		PlayController->ClientTravel(address, ETravelType::TRAVEL_Absolute);
+	}
 }

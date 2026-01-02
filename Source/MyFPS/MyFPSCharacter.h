@@ -90,5 +90,14 @@ public:
 	/** Returns first person camera component **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 
+	UFUNCTION(BlueprintCallable)
+	void OpenLobby();
+
+	UFUNCTION(BlueprintCallable)
+	void CallOpenLevel(const FString& address);
+
+	UFUNCTION(BlueprintCallable)
+	void CallClientTravel(const FString& address);
+
 };
 

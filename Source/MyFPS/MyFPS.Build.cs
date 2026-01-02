@@ -18,7 +18,9 @@ public class MyFPS : ModuleRules
 			"StateTreeModule",
 			"GameplayStateTreeModule",
 			"UMG",
-			"Slate"
+			"Slate",
+
+
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });
