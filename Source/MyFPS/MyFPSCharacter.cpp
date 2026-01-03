@@ -186,7 +186,7 @@ void AMyFPSCharacter::OnCreateSessionComplete(FName SessionName, bool bWasSucces
 		UWorld* World = GetWorld();
 		if (World)
 		{
-			World->ServerTravel(FString("Game/FirstPerson/Maps/Lobby?Listen"));
+			World->ServerTravel(FString("/Game/FirstPerson/Maps/Lobby?Listen"));
 		}
 	}
 
