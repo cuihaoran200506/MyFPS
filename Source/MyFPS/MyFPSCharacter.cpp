@@ -13,7 +13,8 @@
 #include "MyFPS.h"
 
 AMyFPSCharacter::AMyFPSCharacter():
-	CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete))
+	CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete)),
+	FindSessionsCompleteDelegate(FOnFindSessionsCompleteDelegate::CreateUObject(this, &ThisClass::OnFindSessionsComplete))
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
@@ -49,7 +50,7 @@ AMyFPSCharacter::AMyFPSCharacter():
 	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get();
 	if (OnlineSubsystem)
 	{
-		OnlineSubsystem->GetSessionInterface();
+		OnlineSessionInterface = OnlineSubsystem->GetSessionInterface();
 
 		//Debug log
 		if (GEngine)
@@ -192,4 +193,39 @@ void AMyFPSCharacter::OnCreateSessionComplete(FName SessionName, bool bWasSucces
 			);
 		}
 	}
+}
+
+void AMyFPSCharacter::OnFindSessionsComplete(bool bWasSuccessful)
+{
+	for (auto Result : SessionSearch->SearchResults)
+	{
+		FString Id = Result.GetSessionIdStr();
+		FString User = Result.Session.OwningUserName;
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				15.f,
+				FColor::Yellow,
+				FString::Printf(TEXT("Session Id: %s , User Name: %s"),*Id,*User)
+			);
+		}
+	}
+}
+void AMyFPSCharacter::JoinGameSession()
+{
+	// Find Game Session
+
+	if (!OnlineSessionInterface.IsValid())
+		return;
+
+	OnlineSessionInterface->AddOnFindSessionsCompleteDelegate_Handle(FindSessionsCompleteDelegate);
+
+	SessionSearch = MakeShareable(new FOnlineSessionSearch());
+	SessionSearch->MaxSearchResults = 10000;
+	SessionSearch->bIsLanQuery = false;
+	SessionSearch->QuerySettings.Set(FName(TEXT("SEARCH_LOBBIES")), true, EOnlineComparisonOp::Equals);
+
+	const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
+	OnlineSessionInterface->FindSessions(*LocalPlayer->GetPreferredUniqueNetId(), SessionSearch.ToSharedRef());
 }
