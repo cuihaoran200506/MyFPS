@@ -49,6 +49,7 @@ AMyFPSCharacter::AMyFPSCharacter():
 	GetCharacterMovement()->AirControl = 0.5f;
 
 	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get();
+	/*
 	if (OnlineSubsystem)
 	{
 		OnlineSessionInterface = OnlineSubsystem->GetSessionInterface();
@@ -63,7 +64,7 @@ AMyFPSCharacter::AMyFPSCharacter():
 				FString::Printf(TEXT("Found Online Subsystem: %s"), 
 				*OnlineSubsystem->GetSubsystemName().ToString()));
 		}
-	}
+	}*/
 }
 
 void AMyFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
