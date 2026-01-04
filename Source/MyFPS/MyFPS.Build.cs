@@ -19,7 +19,7 @@ public class MyFPS : ModuleRules
 			"GameplayStateTreeModule",
 			"UMG",
 			"Slate",
-			"OnlineSubsystemSteam",
+			"OnlineSubsystemUtils",
 			"OnlineSubsystem"
 
 		});
