@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
-#include "Interfaces/OnlineSessionInterface.h"
 #include "MyFPSCharacter.generated.h"
 
 
@@ -92,31 +91,5 @@ public:
 	/** Returns first person camera component **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 
-public:
-	//Pointer to the online session interface
-	IOnlineSessionPtr OnlineSessionInterface;
-	//TSharedPtr<class IOnlineSession, ESPMode::ThreadSafe> OnlineSessionInterface;
-
-protected:
-
-	UFUNCTION(BlueprintCallable)
-	void CreateGameSession();
-
-	UFUNCTION(BlueprintCallable)
-	void JoinGameSession();
-
-	void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);
-	void OnFindSessionsComplete(bool bWasSuccessful);
-	void OnJoinSessionComplete(FName SessionName,EOnJoinSessionCompleteResult::Type Result);
-
-private:
-
-	FOnCreateSessionCompleteDelegate CreateSessionCompleteDelegate;
-
-	FOnFindSessionsCompleteDelegate FindSessionsCompleteDelegate;
-
-	TSharedPtr<FOnlineSessionSearch> SessionSearch;
-
-	FOnJoinSessionCompleteDelegate JoinSessionCompleteDelegate;
 };
 
