@@ -5,6 +5,8 @@
 #include "MyFPS/Weapon/Weapon.h"
 #include "MyFPS/MyFPSCharacter.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "Components/SphereComponent.h"
+
 UCombatComponent::UCombatComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
@@ -35,11 +37,10 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 	EquippedWeapon = WeaponToEquip;
 	EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
 	const USkeletalMeshSocket* HandSocket = Character->GetFirstPersonMesh()->GetSocketByName(FName("HandGrip_R"));
-	if (HandSocket)
+	if (HandSocket)  
 	{
 		HandSocket->AttachActor(EquippedWeapon, Character->GetFirstPersonMesh());
 	}
 	EquippedWeapon->SetOwner(Character);
-	EquippedWeapon->ShowPickupWidget(false);
 }
 

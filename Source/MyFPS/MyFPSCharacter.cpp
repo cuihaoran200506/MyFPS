@@ -179,7 +179,7 @@ void AMyFPSCharacter::DoJumpStart()
 	// pass Jump to the character
 	Jump();
 }
-
+    
 void AMyFPSCharacter::DoJumpEnd()
 {
 	// pass StopJumping to the character
@@ -188,10 +188,21 @@ void AMyFPSCharacter::DoJumpEnd()
 
 void AMyFPSCharacter::DoEquip()
 {
-	if (Combat && HasAuthority())
+	if (Combat)
+	{
+		if(HasAuthority())
+			Combat->EquipWeapon(OverlappingWeapon);
+		else
+			ServerDoEquip(); 
+	}
+	
+}
+
+void AMyFPSCharacter::ServerDoEquip_Implementation()
+{
+	if (Combat)
 	{
 		Combat->EquipWeapon(OverlappingWeapon);
 	}
 }
-
 

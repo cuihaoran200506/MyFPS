@@ -107,6 +107,8 @@ private:
 	void OnRep_OverlappingWeapon(AWeapon* LastWeapon);
 	UPROPERTY(VisibleAnywhere)
 	class UCombatComponent* Combat;
+	UFUNCTION(Server,Reliable)
+	void ServerDoEquip();
 
 public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

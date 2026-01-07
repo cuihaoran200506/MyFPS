@@ -28,12 +28,6 @@ public class MyFPS : ModuleRules
 
 		PublicIncludePaths.AddRange(new string[] {
 			"MyFPS",
-			"MyFPS/Variant_Horror",
-			"MyFPS/Variant_Horror/UI",
-			"MyFPS/Variant_Shooter",
-			"MyFPS/Variant_Shooter/AI",
-			"MyFPS/Variant_Shooter/UI",
-			"MyFPS/Variant_Shooter/Weapons"
 		});
 
 		// Uncomment if you are using Slate UI
