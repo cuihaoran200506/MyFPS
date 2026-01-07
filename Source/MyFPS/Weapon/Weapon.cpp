@@ -4,7 +4,7 @@
 #include "Weapon.h"
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
-#include "MyFPSCharacter.h"
+#include "Character/MyFPSCharacter.h"
 #include "Net/UnrealNetwork.h"
 // Sets default values
 AWeapon::AWeapon()

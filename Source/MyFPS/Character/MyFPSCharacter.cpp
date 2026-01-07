@@ -8,7 +8,7 @@
 #include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "MyFPS.h"
+#include "MyFPS/MyFPS.h"
 #include "Components/WidgetComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "MyFPS/Weapon/Weapon.h"
@@ -131,6 +131,11 @@ void AMyFPSCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 			OverlappingWeapon->ShowPickupWidget(true);
 		}
 	}
+}
+
+bool AMyFPSCharacter::IsWeaponEquipped()
+{
+	return (Combat && Combat->EquippedWeapon);
 }
 
 
