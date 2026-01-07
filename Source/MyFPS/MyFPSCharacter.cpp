@@ -12,6 +12,7 @@
 #include "Components/WidgetComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "MyFPS/Weapon/Weapon.h"
+#include "MyFPS/Components/CombatComponent.h"
 
 AMyFPSCharacter::AMyFPSCharacter()
 {
@@ -49,12 +50,26 @@ AMyFPSCharacter::AMyFPSCharacter()
 	OverheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
 	OverheadWidget->SetupAttachment(RootComponent);
 
+	Combat = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
+	Combat->SetIsReplicated(true); 
+
+
 }
 
 void AMyFPSCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AMyFPSCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	if (Combat)
+	{
+		Combat->Character = this;
+
+	}
 }
 
 void AMyFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -72,6 +87,9 @@ void AMyFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		// Looking/Aiming
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMyFPSCharacter::LookInput);
 		EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &AMyFPSCharacter::LookInput);
+
+		//Equippping
+		EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Started, this, &AMyFPSCharacter::DoEquip);
 	}
 	else
 	{
@@ -167,4 +185,13 @@ void AMyFPSCharacter::DoJumpEnd()
 	// pass StopJumping to the character
 	StopJumping();
 }
+
+void AMyFPSCharacter::DoEquip()
+{
+	if (Combat && HasAuthority())
+	{
+		Combat->EquipWeapon(OverlappingWeapon);
+	}
+}
+
 

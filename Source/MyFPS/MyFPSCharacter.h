@@ -50,9 +50,13 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	class UInputAction* MouseLookAction;
 
+	UPROPERTY(EditAnywhere, Category = "Input")
+	class UInputAction* EquipAction;
+
 public:
 	AMyFPSCharacter();
 	virtual void Tick(float DeltaTime) override;
+	virtual void PostInitializeComponents()override;
 protected:
 
 	/** Called from Input Actions for movement input */
@@ -77,6 +81,9 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Input")
 	virtual void DoJumpEnd();
 
+	UFUNCTION(BlueprintCallable, Category = "Input")
+	virtual void DoEquip();
+
 protected:
 
 	/** Set up input action bindings */
@@ -98,6 +105,8 @@ private:
 	class AWeapon* OverlappingWeapon;
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(AWeapon* LastWeapon);
+	UPROPERTY(VisibleAnywhere)
+	class UCombatComponent* Combat;
 
 public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
