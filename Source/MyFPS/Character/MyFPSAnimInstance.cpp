@@ -29,4 +29,6 @@ void UMyFPSAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	bIsInAir = MyFPSCharacter->GetCharacterMovement()->IsFalling();
 	bIsAccelerating = MyFPSCharacter->GetCharacterMovement()->GetCurrentAcceleration().Size() > 0.f;
 	bWeaponEquipped = MyFPSCharacter->IsWeaponEquipped();
+	bIsCrouched = MyFPSCharacter->bIsCrouched;
+	bAiming = MyFPSCharacter->IsAiming();
 }

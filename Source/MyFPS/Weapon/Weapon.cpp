@@ -85,14 +85,7 @@ void AWeapon::OnRep_WeaponState()
 	{
 	case EWeaponState::EWS_Equipped:
 		ShowPickupWidget(false);
-		if (AreaSphere)
-		{
-			AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		}
-		if (WeaponMesh)
-		{
-			WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		}
+		AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		break;
 	}
 

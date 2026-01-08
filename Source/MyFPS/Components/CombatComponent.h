@@ -26,10 +26,17 @@ protected:
 
 	virtual void BeginPlay() override;
 
+	void SetAiming(bool bIsAiming);
+
 private:
+
 	class AMyFPSCharacter* Character;
 	UPROPERTY(Replicated)
 	AWeapon* EquippedWeapon;
+	UPROPERTY(Replicated)
+	bool bAiming;
+	UFUNCTION(Server, Reliable)
+	void ServerSetAiming(bool bIsAiming);
 public:	
 	
 

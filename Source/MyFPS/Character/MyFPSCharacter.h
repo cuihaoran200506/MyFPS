@@ -53,6 +53,12 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	class UInputAction* EquipAction;
 
+	UPROPERTY(EditAnywhere, Category = "Input")
+	class UInputAction* CrouchAction;
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	class UInputAction* AdsAction;
+
 public:
 	AMyFPSCharacter();
 	virtual void Tick(float DeltaTime) override;
@@ -84,11 +90,16 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Input")
 	virtual void DoEquip();
 
+	UFUNCTION(BlueprintCallable, Category = "Input")
+	virtual void DoCrouch();
+
+	UFUNCTION(BlueprintCallable, Category = "Input")
+	virtual void DoAds();
+
 protected:
 
 	/** Set up input action bindings */
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
-
 
 public:
 
@@ -109,6 +120,8 @@ private:
 	class UCombatComponent* Combat;
 	UFUNCTION(Server,Reliable)
 	void ServerDoEquip();
+	
+
 
 public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -116,4 +129,6 @@ public:
 	void SetOverlappingWeapon(AWeapon* Weapon);
 	
 	bool IsWeaponEquipped();
+
+	bool IsAiming();
 };

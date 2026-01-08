@@ -53,7 +53,7 @@ AMyFPSCharacter::AMyFPSCharacter()
 	Combat = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	Combat->SetIsReplicated(true); 
 
-
+	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 }
 
 void AMyFPSCharacter::Tick(float DeltaTime)
@@ -90,6 +90,11 @@ void AMyFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 		//Equippping
 		EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Started, this, &AMyFPSCharacter::DoEquip);
+		//Crouching
+		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Started, this, &AMyFPSCharacter::DoCrouch);
+		//ADS
+		EnhancedInputComponent->BindAction(AdsAction, ETriggerEvent::Started, this, &AMyFPSCharacter::DoAds);
+
 	}
 	else
 	{
@@ -137,6 +142,11 @@ bool AMyFPSCharacter::IsWeaponEquipped()
 {
 	return (Combat && Combat->EquippedWeapon);
 }
+
+bool AMyFPSCharacter::IsAiming()
+{
+	return (Combat && Combat->bAiming);
+} 
 
 
 void AMyFPSCharacter::MoveInput(const FInputActionValue& Value)
@@ -210,4 +220,22 @@ void AMyFPSCharacter::ServerDoEquip_Implementation()
 		Combat->EquipWeapon(OverlappingWeapon);
 	}
 }
+
+void AMyFPSCharacter::DoCrouch()
+{
+	if (bIsCrouched)
+		UnCrouch();
+	else
+		Crouch();
+}
+
+void AMyFPSCharacter::DoAds()
+{
+	if (Combat)
+	{
+		Combat->SetAiming(!Combat->bAiming);
+	}
+}
+
+
 
