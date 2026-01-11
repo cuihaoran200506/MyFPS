@@ -96,6 +96,8 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Input")
 	virtual void DoAds();
 
+	void AimOffset(float DeltaTime);
+
 protected:
 
 	/** Set up input action bindings */
@@ -118,17 +120,27 @@ private:
 	void OnRep_OverlappingWeapon(AWeapon* LastWeapon);
 	UPROPERTY(VisibleAnywhere)
 	class UCombatComponent* Combat;
-	UFUNCTION(Server,Reliable)
+	UFUNCTION(Server, Reliable)
 	void ServerDoEquip();
-	
 
 
+	float AO_Pitch;
+	/*
+	FRotator StartingAimRotation;
+	float AO_Yaw;
+	*/
 public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	void SetOverlappingWeapon(AWeapon* Weapon);
-	
+
 	bool IsWeaponEquipped();
 
 	bool IsAiming();
+	/*
+	FORCEINLINE float GetAO_Yaw() const { return AO_Yaw; }
+	*/
+	FORCEINLINE float GetAO_Pitch() const { return AO_Pitch; }
+
+	AWeapon* GetEquippedWeapon();
 };

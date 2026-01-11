@@ -54,11 +54,20 @@ AMyFPSCharacter::AMyFPSCharacter()
 	Combat->SetIsReplicated(true); 
 
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
+
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+	FirstPersonMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+
+	NetUpdateFrequency = 66.f;
+	MinNetUpdateFrequency = 33.f;
 }
 
 void AMyFPSCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	AimOffset(DeltaTime);
 
 }
 
@@ -146,7 +155,14 @@ bool AMyFPSCharacter::IsWeaponEquipped()
 bool AMyFPSCharacter::IsAiming()
 {
 	return (Combat && Combat->bAiming);
-} 
+}
+ 
+AWeapon* AMyFPSCharacter::GetEquippedWeapon()
+{
+	if (Combat == nullptr)return nullptr;
+	else return Combat->EquippedWeapon;
+}
+
 
 
 void AMyFPSCharacter::MoveInput(const FInputActionValue& Value)
@@ -234,6 +250,35 @@ void AMyFPSCharacter::DoAds()
 	if (Combat)
 	{
 		Combat->SetAiming(!Combat->bAiming);
+	}
+}
+
+void AMyFPSCharacter::AimOffset(float DeltaTime)
+{
+	if (Combat && Combat->EquippedWeapon == nullptr)return;
+	/*
+	FVector Velocity = GetVelocity();
+	Velocity.Z = 0.f;
+	float Speed = Velocity.Size();
+	bool IsInAir = GetCharacterMovement()->IsFalling();
+	if (Speed == 0.f && !IsInAir)
+	{
+		FRotator CurrentAimRotation= FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
+		FRotator DeltaAimRotation = UKismetMathLibrary::NormalizedDeltaRotator(CurrentAimRotation, StartingAimRotation);
+		AO_Yaw = DeltaAimRotation.Yaw;
+	}
+	if (Speed > 0.f || IsInAir)
+	{
+		StartingAimRotation=FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
+		AO_Yaw = 0.f;
+	}
+	*/
+	AO_Pitch = GetBaseAimRotation().Pitch;
+	if (AO_Pitch > 90.f && !IsLocallyControlled())
+	{
+		FVector2D InRange(270.f, 360.f);
+		FVector2D OutRange(-90.f, 0.f);
+		AO_Pitch = FMath::GetMappedRangeValueClamped(InRange, OutRange, AO_Pitch);
 	}
 }
 
