@@ -29,8 +29,8 @@ AMyFPSCharacter::AMyFPSCharacter()
 
 	// Create the Camera Component	
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("First Person Camera"));
-	FirstPersonCameraComponent->SetupAttachment(FirstPersonMesh, FName("head"));
-	FirstPersonCameraComponent->SetRelativeLocationAndRotation(FVector(-2.8f, 5.89f, 0.0f), FRotator(0.0f, 90.0f, -90.0f));
+	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
+	FirstPersonCameraComponent->SetRelativeLocation(FVector(15.0f, 0.0f, StandHeight));
 	FirstPersonCameraComponent->bUsePawnControlRotation = true;
 	FirstPersonCameraComponent->bEnableFirstPersonFieldOfView = true;
 	FirstPersonCameraComponent->bEnableFirstPersonScale = true;
@@ -59,16 +59,33 @@ AMyFPSCharacter::AMyFPSCharacter()
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	FirstPersonMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 
-	NetUpdateFrequency = 66.f;
-	MinNetUpdateFrequency = 33.f;
+	SetNetUpdateFrequency(66.f);
+	SetMinNetUpdateFrequency(33.f);
 }
 
 void AMyFPSCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+    //adapt to firing
+	if (FirstPersonCameraComponent)
+	{
+		float TargetZ = bIsCrouched ? CrouchHeight : StandHeight;
+		FVector CurrentRelativeLocation = FirstPersonCameraComponent->GetRelativeLocation();
+		if (GetVelocity().Size() > 10.f && IsAiming())
+		{
+			if (bIsCrouched)
+			{
+				TargetZ += 20.0f;
+			}
+			else
+			{
+				TargetZ -= 15.0f;
+			}
+		}
+		float NewZ = FMath::FInterpTo(CurrentRelativeLocation.Z, TargetZ, DeltaTime, 8.f);
+		FirstPersonCameraComponent->SetRelativeLocation(FVector(CurrentRelativeLocation.X, CurrentRelativeLocation.Y, NewZ));
+	}
 	AimOffset(DeltaTime);
-
 }
 
 void AMyFPSCharacter::PostInitializeComponents()

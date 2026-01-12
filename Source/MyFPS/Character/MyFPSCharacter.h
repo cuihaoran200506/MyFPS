@@ -33,6 +33,17 @@ class AMyFPSCharacter : public ACharacter
 	UCameraComponent* FirstPersonCameraComponent;
 
 protected:
+	//Camera settings
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat | Camera")
+	float StandHeight = 64.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat | Camera")
+	float CrouchHeight = 35.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat | Camera")
+	float CameraInterpSpeed = 15.f;
+
+protected:
 
 	/** Jump Input Action */
 	UPROPERTY(EditAnywhere, Category = "Input")

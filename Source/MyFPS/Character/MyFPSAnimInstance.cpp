@@ -62,6 +62,7 @@ void UMyFPSAnimInstance::NativeUpdateAnimation(float DeltaTime)
 		FRotator OutRotation;
 		MyFPSCharacter->GetMesh()->TransformToBoneSpace(FName("hand_r"), LeftHandTransform.GetLocation(), FRotator::ZeroRotator, OutPosition, OutRotation );
 		LeftHandTransform.SetLocation(OutPosition);
-		LeftHandTransform.SetRotation(FQuat(OutRotation));
+		FRotator FixedRotation = FRotator(OutRotation.Pitch, OutRotation.Yaw, 0.f);
+		LeftHandTransform.SetRotation(FQuat(FixedRotation));
 	}
 }

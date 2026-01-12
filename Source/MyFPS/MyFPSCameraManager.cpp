@@ -6,6 +6,6 @@
 AMyFPSCameraManager::AMyFPSCameraManager()
 {
 	// set the min/max pitch
-	ViewPitchMin = -70.0f;
-	ViewPitchMax = 80.0f;
+	ViewPitchMin = -45.0f;
+	ViewPitchMax = 75.0f;
 }
