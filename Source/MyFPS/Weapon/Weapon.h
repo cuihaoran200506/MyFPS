@@ -39,6 +39,8 @@ public:
 
 	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() const { return WeaponMesh; }
 
+	void Fire();
+
 private:  
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties") 
@@ -51,7 +53,8 @@ private:
 	void OnRep_WeaponState(); 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
 	class UWidgetComponent* PickupWidget;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Properties", meta = (AllowPrivateAccess = "true"))
+	class UAnimationAsset* FireAnimation;
 protected:
 	UFUNCTION()
 	virtual void OnSphereOverlap(

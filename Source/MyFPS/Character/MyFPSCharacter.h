@@ -70,10 +70,16 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	class UInputAction* AdsAction;
 
+	UPROPERTY(EditAnywhere, Category = "Input")
+	class UInputAction* FireAction;
+
 public:
 	AMyFPSCharacter();
 	virtual void Tick(float DeltaTime) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PostInitializeComponents()override;
+	void PlayFireMontage(bool bAiming);
+
 protected:
 
 	/** Called from Input Actions for movement input */
@@ -107,6 +113,12 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Input")
 	virtual void DoAds();
 
+	UFUNCTION(BlueprintCallable, Category = "Input")
+	virtual void DoFireStart();
+
+	UFUNCTION(BlueprintCallable, Category = "Input")
+	virtual void DoFireEnd();
+
 	void AimOffset(float DeltaTime);
 
 protected:
@@ -134,14 +146,15 @@ private:
 	UFUNCTION(Server, Reliable)
 	void ServerDoEquip();
 
-
-	float AO_Pitch;
 	/*
 	FRotator StartingAimRotation;
 	float AO_Yaw;
 	*/
+	float AO_Pitch;
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	class UAnimMontage* FireWeaponMontage;
+
 public:
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	void SetOverlappingWeapon(AWeapon* Weapon);
 

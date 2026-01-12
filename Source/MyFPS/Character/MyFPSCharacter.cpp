@@ -30,7 +30,7 @@ AMyFPSCharacter::AMyFPSCharacter()
 	// Create the Camera Component	
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("First Person Camera"));
 	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
-	FirstPersonCameraComponent->SetRelativeLocation(FVector(15.0f, 0.0f, StandHeight));
+	FirstPersonCameraComponent->SetRelativeLocation(FVector(20.0f, 0.0f, StandHeight));
 	FirstPersonCameraComponent->bUsePawnControlRotation = true;
 	FirstPersonCameraComponent->bEnableFirstPersonFieldOfView = true;
 	FirstPersonCameraComponent->bEnableFirstPersonScale = true;
@@ -71,6 +71,10 @@ void AMyFPSCharacter::Tick(float DeltaTime)
 	{
 		float TargetZ = bIsCrouched ? CrouchHeight : StandHeight;
 		FVector CurrentRelativeLocation = FirstPersonCameraComponent->GetRelativeLocation();
+		if (IsWeaponEquipped() && !IsAiming())
+		{
+			TargetZ -= 10.0f; 
+		}
 		if (GetVelocity().Size() > 10.f && IsAiming())
 		{
 			if (bIsCrouched)
@@ -98,6 +102,27 @@ void AMyFPSCharacter::PostInitializeComponents()
 	}
 }
 
+void AMyFPSCharacter::PlayFireMontage(bool bAiming)
+{
+	if (Combat == nullptr || Combat->EquippedWeapon == nullptr)return;
+
+	UAnimInstance* AnimInstanceFP = FirstPersonMesh->GetAnimInstance();
+	UAnimInstance* AnimInstanceTP = GetMesh()->GetAnimInstance();
+	if (AnimInstanceFP&&FireWeaponMontage)
+	{
+		AnimInstanceFP->Montage_Play(FireWeaponMontage);
+		FName SectionName;
+		SectionName = bAiming ? FName("RifleAim") : FName("RifleHip");
+		AnimInstanceFP->Montage_JumpToSection(SectionName);
+	}
+	if (AnimInstanceTP && FireWeaponMontage) 
+	{
+		AnimInstanceTP->Montage_Play(FireWeaponMontage);
+		FName SectionName = bAiming ? FName("RifleAim") : FName("RifleHip");
+		AnimInstanceTP->Montage_JumpToSection(SectionName);
+	}
+}
+
 void AMyFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {	
 	// Set up action bindings
@@ -120,7 +145,9 @@ void AMyFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Started, this, &AMyFPSCharacter::DoCrouch);
 		//ADS
 		EnhancedInputComponent->BindAction(AdsAction, ETriggerEvent::Started, this, &AMyFPSCharacter::DoAds);
-
+		//Fire
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &AMyFPSCharacter::DoFireStart);
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &AMyFPSCharacter::DoFireEnd);
 	}
 	else
 	{
@@ -270,6 +297,8 @@ void AMyFPSCharacter::DoAds()
 	}
 }
 
+
+
 void AMyFPSCharacter::AimOffset(float DeltaTime)
 {
 	if (Combat && Combat->EquippedWeapon == nullptr)return;
@@ -283,7 +312,7 @@ void AMyFPSCharacter::AimOffset(float DeltaTime)
 		FRotator CurrentAimRotation= FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
 		FRotator DeltaAimRotation = UKismetMathLibrary::NormalizedDeltaRotator(CurrentAimRotation, StartingAimRotation);
 		AO_Yaw = DeltaAimRotation.Yaw;
-	}
+	} 
 	if (Speed > 0.f || IsInAir)
 	{
 		StartingAimRotation=FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
@@ -300,4 +329,18 @@ void AMyFPSCharacter::AimOffset(float DeltaTime)
 }
 
 
+void AMyFPSCharacter::DoFireStart()
+{
+	if (Combat)
+	{
+		Combat->FireButtonPressed(true);
+	}
+}
 
+void AMyFPSCharacter::DoFireEnd()
+{
+	if (Combat)
+	{
+		Combat->FireButtonPressed(false);
+	}
+}
