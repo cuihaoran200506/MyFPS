@@ -35,11 +35,12 @@ public:
 	void ShowPickupWidget(bool bShowWidget);
 	void SetWeaponState(EWeaponState State);
 	FORCEINLINE USphereComponent* GetAreaSphere() const { return AreaSphere; }
+
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const override;
 
 	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() const { return WeaponMesh; }
 
-	void Fire();
+	virtual void Fire(const FVector& HitTarget);
 
 private:  
 
@@ -53,8 +54,11 @@ private:
 	void OnRep_WeaponState(); 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
 	class UWidgetComponent* PickupWidget;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Properties", meta = (AllowPrivateAccess = "true"))
-	class UAnimationAsset* FireAnimation;
+
+	UPROPERTY(EditAnywhere, Category = "Weapon Properties")
+	class UNiagaraSystem* FireNiagara;
+	UPROPERTY(EditAnywhere, Category = "Weapon Properties")
+	class USoundBase* FireSound;
 protected:
 	UFUNCTION()
 	virtual void OnSphereOverlap(

@@ -20,8 +20,8 @@ public class MyFPS : ModuleRules
 			"UMG",
 			"Slate",
 			"OnlineSubsystemUtils",
-			"OnlineSubsystem"
-
+			"OnlineSubsystem",
+			"Niagara",
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });

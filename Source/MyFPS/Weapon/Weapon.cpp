@@ -8,6 +8,9 @@
 #include "Net/UnrealNetwork.h"
 #include "Animation/AnimationAsset.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "NiagaraFunctionLibrary.h" 
+#include "NiagaraComponent.h"
+#include "Kismet/GameplayStatics.h"
 // Sets default values
 AWeapon::AWeapon()
 {
@@ -81,11 +84,24 @@ void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	DOREPLIFETIME(AWeapon, WeaponState);
 }
 
-void AWeapon::Fire()
+void AWeapon::Fire(const FVector& HitTarget)
 {
-	if (FireAnimation)
+	if (FireNiagara)
 	{
-		WeaponMesh->PlayAnimation(FireAnimation, false);
+		UNiagaraFunctionLibrary::SpawnSystemAttached(
+			FireNiagara,
+			WeaponMesh,
+			FName("MuzzleFlash"),
+			FVector::ZeroVector,
+			FRotator::ZeroRotator,
+			EAttachLocation::SnapToTarget,
+			true
+		);
+	}
+
+	if (FireSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
 	}
 }
 
