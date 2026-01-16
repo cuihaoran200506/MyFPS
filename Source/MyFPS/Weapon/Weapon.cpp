@@ -11,6 +11,8 @@
 #include "NiagaraFunctionLibrary.h" 
 #include "NiagaraComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Casing.h"
+#include "Engine/SkeletalMeshSocket.h"
 // Sets default values
 AWeapon::AWeapon()
 {
@@ -102,6 +104,21 @@ void AWeapon::Fire(const FVector& HitTarget)
 	if (FireSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+	}
+
+	if (CasingClass)
+	{
+		const USkeletalMeshSocket* AmmoEjectSocket = WeaponMesh->GetSocketByName(FName("AmmoEject"));
+		APawn* InstigatorPawn = Cast<APawn>(GetOwner());
+		if (AmmoEjectSocket)
+		{
+			const FTransform SocketTransform = AmmoEjectSocket->GetSocketTransform(WeaponMesh);
+			UWorld* World = GetWorld();
+			if (World)
+			{
+				World->SpawnActor<ACasing>(CasingClass, SocketTransform.GetLocation(), SocketTransform.GetRotation().Rotator());
+			}
+		} 
 	}
 }
 

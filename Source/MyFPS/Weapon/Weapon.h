@@ -59,6 +59,8 @@ private:
 	class UNiagaraSystem* FireNiagara;
 	UPROPERTY(EditAnywhere, Category = "Weapon Properties")
 	class USoundBase* FireSound;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class ACasing> CasingClass;
 protected:
 	UFUNCTION()
 	virtual void OnSphereOverlap(
