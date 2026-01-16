@@ -7,6 +7,7 @@
 #include "Components/SphereComponent.h"
 #include "Weapon.generated.h"
 
+
 UENUM(BlueprintType)
 enum class EWeaponState :uint8
 {
@@ -42,6 +43,17 @@ public:
 
 	virtual void Fire(const FVector& HitTarget);
 
+	UPROPERTY(EditAnywhere, Category = Crosshairs)
+	class UTexture2D* CrosshairsCenter;
+	UPROPERTY(EditAnywhere, Category = Crosshairs)
+	UTexture2D* CrosshairsLeft;
+	UPROPERTY(EditAnywhere, Category = Crosshairs)
+	UTexture2D* CrosshairsRight;
+	UPROPERTY(EditAnywhere, Category = Crosshairs)
+	UTexture2D* CrosshairsTop;
+	UPROPERTY(EditAnywhere, Category = Crosshairs)
+	UTexture2D* CrosshairsBottom;
+
 private:  
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties") 
@@ -61,6 +73,9 @@ private:
 	class USoundBase* FireSound;
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ACasing> CasingClass;
+	
+
+
 protected:
 	UFUNCTION()
 	virtual void OnSphereOverlap(

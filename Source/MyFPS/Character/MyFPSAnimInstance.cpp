@@ -64,5 +64,7 @@ void UMyFPSAnimInstance::NativeUpdateAnimation(float DeltaTime)
 		LeftHandTransform.SetLocation(OutPosition);
 		FRotator FixedRotation = FRotator(OutRotation.Pitch, OutRotation.Yaw, 0.f);
 		LeftHandTransform.SetRotation(FQuat(FixedRotation));
+
+		
 	}
 }
