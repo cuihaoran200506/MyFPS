@@ -54,13 +54,6 @@ void AProjectile::BeginPlay()
 
 void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-
-	float DistanceTraveled = FVector::Dist(GetActorLocation(), FVector::ZeroVector);
-
-	UE_LOG(LogTemp, Warning, TEXT("Hit Detected! Actor: %s | Distance from Origin: %f | HitPoint: %s"),
-		OtherActor ? *OtherActor->GetName() : TEXT("None"),
-		DistanceTraveled,
-		*Hit.ImpactPoint.ToString());
 	if (HasAuthority())
 	{
 		Multicast_PlayImpactEffects(Hit.ImpactPoint, Hit.ImpactNormal);
