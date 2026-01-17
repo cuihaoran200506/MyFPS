@@ -64,7 +64,23 @@ void UMyFPSAnimInstance::NativeUpdateAnimation(float DeltaTime)
 		LeftHandTransform.SetLocation(OutPosition);
 		FRotator FixedRotation = FRotator(OutRotation.Pitch, OutRotation.Yaw, 0.f);
 		LeftHandTransform.SetRotation(FQuat(FixedRotation));
+		/*
+		FTransform MuzzleTipTransform = EquippedWeapon->GetWeaponMesh()->GetSocketTransform(FName("MuzzleFlash"), ERelativeTransformSpace::RTS_World);
+		FVector MuzzleX(FRotationMatrix(MuzzleTipTransform.GetRotation().Rotator()).GetUnitAxis(EAxis::X));
 
-		
+		DrawDebugLine(
+			GetWorld(),
+			MuzzleTipTransform.GetLocation(),
+			MuzzleTipTransform.GetLocation() + MuzzleX * 100.f,
+			FColor::Red
+		);
+		DrawDebugLine(
+			GetWorld(),
+			MuzzleTipTransform.GetLocation(),
+			MyFPSCharacter->GetHitTarget(),
+			FColor::Green
+		);
+		*/
 	}
+
 }

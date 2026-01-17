@@ -207,6 +207,12 @@ AWeapon* AMyFPSCharacter::GetEquippedWeapon()
 	else return Combat->EquippedWeapon;
 }
 
+FVector AMyFPSCharacter::GetHitTarget() const
+{
+	if(Combat==nullptr)return FVector();
+	return Combat->HitTarget;
+}
+
 
 
 void AMyFPSCharacter::MoveInput(const FInputActionValue& Value)
