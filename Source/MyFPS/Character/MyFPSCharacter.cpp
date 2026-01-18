@@ -56,6 +56,7 @@ AMyFPSCharacter::AMyFPSCharacter()
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+	GetMesh()->SetCollisionObjectType(ECC_SkeletalMesh);
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
 	FirstPersonMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
@@ -124,6 +125,26 @@ void AMyFPSCharacter::PlayFireMontage(bool bAiming)
 	}
 }
 
+void AMyFPSCharacter::PlayHitReactMontage()
+{
+	if (Combat == nullptr || Combat->EquippedWeapon == nullptr)return;
+
+	UAnimInstance* AnimInstanceFP = FirstPersonMesh->GetAnimInstance();
+	UAnimInstance* AnimInstanceTP = GetMesh()->GetAnimInstance();
+	if (AnimInstanceFP && HitReactMontage)
+	{
+		AnimInstanceFP->Montage_Play(HitReactMontage);
+		FName SectionName("FromFront");
+		AnimInstanceFP->Montage_JumpToSection(SectionName);
+	}
+	if (AnimInstanceTP && HitReactMontage)
+	{
+		AnimInstanceTP->Montage_Play(HitReactMontage);
+		FName SectionName("FromFront");
+		AnimInstanceFP->Montage_JumpToSection(SectionName);
+	}
+}
+
 void AMyFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {	
 	// Set up action bindings
@@ -174,6 +195,11 @@ void AMyFPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 
 	DOREPLIFETIME_CONDITION (AMyFPSCharacter, OverlappingWeapon,COND_OwnerOnly); 
 
+}
+
+void AMyFPSCharacter::MulticastHit_Implementation()
+{
+	PlayHitReactMontage();
 }
 
 void AMyFPSCharacter::SetOverlappingWeapon(AWeapon* Weapon)

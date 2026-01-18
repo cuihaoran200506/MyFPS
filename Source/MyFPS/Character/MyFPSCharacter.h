@@ -80,6 +80,8 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PostInitializeComponents()override;
 	void PlayFireMontage(bool bAiming);
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastHit();
 
 protected:
 
@@ -122,6 +124,8 @@ protected:
 
 	void AimOffset(float DeltaTime);
 
+	void PlayHitReactMontage();
+
 protected:
 
 	/** Set up input action bindings */
@@ -154,6 +158,8 @@ private:
 	float AO_Pitch;
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	class UAnimMontage* FireWeaponMontage;
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	class UAnimMontage* HitReactMontage;
 
 public:
 

@@ -7,8 +7,8 @@
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
-
-
+#include "MyFPS/Character/MyFPSCharacter.h"
+#include "MyFPS/MyFPS.h"
 // Sets default values
 AProjectile::AProjectile()
 {
@@ -24,6 +24,7 @@ AProjectile::AProjectile()
 	CollisionBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
 	CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Block);
+	CollisionBox->SetCollisionResponseToChannel(ECC_SkeletalMesh, ECollisionResponse::ECR_Block);
 
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
 	ProjectileMovementComponent->bRotationFollowsVelocity = true;
@@ -33,7 +34,11 @@ AProjectile::AProjectile()
 void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-
+	AActor* MyOwner = GetOwner();
+	if (MyOwner)
+	{
+		CollisionBox->IgnoreActorWhenMoving(MyOwner, true);
+	}
 	if (TracerNiagara)
 	{
 		UNiagaraFunctionLibrary::SpawnSystemAttached(
@@ -54,6 +59,11 @@ void AProjectile::BeginPlay()
 
 void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	AMyFPSCharacter* MyFPSCharacter = Cast<AMyFPSCharacter>(OtherActor);
+	if (MyFPSCharacter)
+	{
+		MyFPSCharacter->MulticastHit();
+	}
 	if (HasAuthority())
 	{
 		Multicast_PlayImpactEffects(Hit.ImpactPoint, Hit.ImpactNormal);
