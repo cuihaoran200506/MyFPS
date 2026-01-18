@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+#include "MyFPS/Interfaces/InteractWithCrosshairsInterface.h"
 #include "MyFPSCharacter.generated.h"
 
 
@@ -20,7 +21,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
  *  A basic first person character
  */
 UCLASS(abstract)
-class AMyFPSCharacter : public ACharacter
+class AMyFPSCharacter : public ACharacter, public IInteractWithCrosshairsInterface
 {
 	GENERATED_BODY()
 
@@ -169,4 +170,6 @@ public:
 	AWeapon* GetEquippedWeapon();
 
 	FVector GetHitTarget() const;
+
+	FORCEINLINE UCameraComponent* GetCamera() const { return FirstPersonCameraComponent; }
 };

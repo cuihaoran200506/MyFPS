@@ -35,7 +35,7 @@ AMyFPSCharacter::AMyFPSCharacter()
 	FirstPersonCameraComponent->bEnableFirstPersonFieldOfView = true;
 	FirstPersonCameraComponent->bEnableFirstPersonScale = true;
 	FirstPersonCameraComponent->FirstPersonFieldOfView = 70.0f;
-	FirstPersonCameraComponent->FirstPersonScale = 0.6f;
+	FirstPersonCameraComponent->FirstPersonScale = 0.9f;
 
 	// configure the character comps
 	GetMesh()->SetOwnerNoSee(true);
@@ -57,6 +57,7 @@ AMyFPSCharacter::AMyFPSCharacter()
 
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
 	FirstPersonMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 
 	SetNetUpdateFrequency(66.f);
