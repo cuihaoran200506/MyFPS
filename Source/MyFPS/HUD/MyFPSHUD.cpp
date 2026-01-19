@@ -2,7 +2,24 @@
 
 
 #include "MyFPSHUD.h"
+#include "GameFramework/PlayerController.h"
+#include "CharacterOverlay.h"
 
+void AMyFPSHUD::BeginPlay()
+{
+	Super::BeginPlay();
+	AddCharacterOverlay();
+}
+
+void AMyFPSHUD::AddCharacterOverlay()
+{
+	APlayerController* PlayerController = GetOwningPlayerController();
+	if (PlayerController && CharacterOverlayClass)
+	{
+		CharacterOverlay = CreateWidget<UCharacterOverlay>(PlayerController, CharacterOverlayClass);
+		CharacterOverlay->AddToViewport();
+	}
+}
 
 void AMyFPSHUD::DrawHUD()
 {

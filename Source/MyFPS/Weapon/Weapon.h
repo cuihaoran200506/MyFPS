@@ -61,6 +61,10 @@ public:
 	FORCEINLINE float GetZoomedFOV() const { return ZoomedFOV; }
 	FORCEINLINE float GetZoomInterpSpeed() const { return ZoomInterpSpeed; }
 
+	UPROPERTY(EditAnywhere, Category = Combat)
+	bool bAutomatic = true;
+	UPROPERTY(EditAnywhere, Category = Combat)
+	float FireDelay = 0.15f;
 private:  
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties") 

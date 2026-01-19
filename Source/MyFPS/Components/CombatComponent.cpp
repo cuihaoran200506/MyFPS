@@ -12,7 +12,8 @@
 #include "DrawDebugHelpers.h"
 #include "MyFPS/MyFPSPlayerController.h"
 #include "Camera/CameraComponent.h"
-
+#include "MyFPS.h"
+#include "TimerManager.h"
 UCombatComponent::UCombatComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -129,6 +130,31 @@ void UCombatComponent::InterpFOV(float DeltaTime)
 	}
 }
 
+void UCombatComponent::StartFireTimer()
+{
+	if (GetWorld() == nullptr || EquippedWeapon == nullptr)
+	{
+		bCanFire = true;
+		return;
+	}
+
+	GetWorld()->GetTimerManager().SetTimer(
+		FireTimer,
+		this,
+		&UCombatComponent::FireTimerFinished,
+		EquippedWeapon->FireDelay
+	);
+}
+
+void UCombatComponent::FireTimerFinished()
+{
+	bCanFire = true;
+	if (EquippedWeapon && bFireButtonPressed && EquippedWeapon->bAutomatic)
+	{
+		Fire();
+	}
+}
+
 void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -193,13 +219,22 @@ void UCombatComponent::FireButtonPressed(bool bPressed)
 	
 	if (bFireButtonPressed)
 	{
-		FHitResult HitResult;
-		TraceUnderCrosshairs(HitResult);
-		ServerFire(HitResult.ImpactPoint);
+		Fire();
+	}
+}
+
+void UCombatComponent::Fire()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Fire Called! bCanFire: %d"), bCanFire);
+	if (bCanFire) 
+	{
+		bCanFire = false;
+		ServerFire(HitTarget);
 		if (EquippedWeapon)
 		{
 			CrosshairShootingFactor += 0.75f;
 		}
+		StartFireTimer();
 	}
 }
 
@@ -242,7 +277,7 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
 		FVector End = Start + CrosshairWorldDirection * TRACE_LENGTH;
 		FCollisionQueryParams QueryParams;
 		QueryParams.AddIgnoredActor(Character); 
-		GetWorld()->LineTraceSingleByChannel(TraceHitResult, Start, End, ECC_Visibility, QueryParams);
+		GetWorld()->LineTraceSingleByChannel(TraceHitResult, Start, End, ECC_SkeletalMesh, QueryParams);
 		if (TraceHitResult.GetActor() && TraceHitResult.GetActor()->Implements<UInteractWithCrosshairsInterface>())
 		{
 			HUDPackage.CrosshairsColor = FLinearColor::Red;

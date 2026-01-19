@@ -194,12 +194,16 @@ void AMyFPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION (AMyFPSCharacter, OverlappingWeapon,COND_OwnerOnly); 
-
+	DOREPLIFETIME(AMyFPSCharacter, Health);
 }
 
 void AMyFPSCharacter::MulticastHit_Implementation()
 {
 	PlayHitReactMontage();
+}
+
+void AMyFPSCharacter::OnRep_Health()
+{
 }
 
 void AMyFPSCharacter::SetOverlappingWeapon(AWeapon* Weapon)
