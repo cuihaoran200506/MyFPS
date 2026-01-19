@@ -24,6 +24,7 @@ public:
 	/** Constructor */
 	AMyFPSPlayerController();
 
+	void SetHUDHealth(float Health, float MaxHealth);
 protected:
 
 	/** Input Mapping Contexts */
@@ -54,4 +55,7 @@ protected:
 
 	/** Returns true if the player should use UMG touch controls */
 	bool ShouldUseTouchControls() const;
+
+private:
+	class AMyFPSHUD* MyFPSHUD;
 };

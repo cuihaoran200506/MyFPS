@@ -34,6 +34,8 @@ class AMyFPSCharacter : public ACharacter, public IInteractWithCrosshairsInterfa
 	UCameraComponent* FirstPersonCameraComponent;
 
 protected:
+
+	virtual void BeginPlay() override;
 	//Camera settings
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat | Camera")
 	float StandHeight = 64.f;
@@ -167,6 +169,8 @@ private:
 	float Health = 100.f;
 	UFUNCTION()
 	void OnRep_Health();
+
+	class AMyFPSPlayerController* MyFPSPlayerController;
 public:
 
 	void SetOverlappingWeapon(AWeapon* Weapon);

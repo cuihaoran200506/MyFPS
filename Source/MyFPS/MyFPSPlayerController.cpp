@@ -9,6 +9,10 @@
 #include "Blueprint/UserWidget.h"
 #include "MyFPS.h"
 #include "Widgets/Input/SVirtualJoystick.h"
+#include "MyFPS/HUD/MyFPSHUD.h"
+#include "MyFPS/HUD/CharacterOverlay.h"
+#include "Components/ProgressBar.h"
+#include "Components/TextBlock.h"
 
 AMyFPSPlayerController::AMyFPSPlayerController()
 {
@@ -16,11 +20,24 @@ AMyFPSPlayerController::AMyFPSPlayerController()
 	PlayerCameraManagerClass = AMyFPSCameraManager::StaticClass();
 }
 
+void AMyFPSPlayerController::SetHUDHealth(float Health, float MaxHealth)
+{
+	MyFPSHUD = MyFPSHUD == nullptr ? Cast<AMyFPSHUD>(GetHUD()) : MyFPSHUD;
+	bool bHUDValid = MyFPSHUD && MyFPSHUD->CharacterOverlay && MyFPSHUD->CharacterOverlay->HealthBar && MyFPSHUD->CharacterOverlay->HealthText;
+	if(bHUDValid)
+	{
+		const float HealthPercent = Health / MaxHealth;
+		MyFPSHUD->CharacterOverlay->HealthBar->SetPercent(HealthPercent);
+		FString HealthText = FString::Printf(TEXT("%d / %d"), FMath::CeilToInt(Health), FMath::CeilToInt(MaxHealth));
+		MyFPSHUD->CharacterOverlay->HealthText->SetText(FText::FromString(HealthText));
+	}
+}
+
 void AMyFPSPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
+	MyFPSHUD = Cast<AMyFPSHUD>(GetHUD());
 	// only spawn touch controls on local player controllers
 	if (ShouldUseTouchControls() && IsLocalPlayerController())
 	{

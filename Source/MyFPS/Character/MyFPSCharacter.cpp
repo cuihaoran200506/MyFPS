@@ -13,6 +13,17 @@
 #include "Net/UnrealNetwork.h"
 #include "MyFPS/Weapon/Weapon.h"
 #include "MyFPS/Components/CombatComponent.h"
+#include "MyFPS/MyFPSPlayerController.h"
+
+void AMyFPSCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	MyFPSPlayerController= Cast<AMyFPSPlayerController>(Controller);
+	if(MyFPSPlayerController)
+	{
+		MyFPSPlayerController->SetHUDHealth(Health, MaxHealth);
+	}
+}
 
 AMyFPSCharacter::AMyFPSCharacter()
 {
