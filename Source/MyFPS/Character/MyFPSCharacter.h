@@ -82,8 +82,6 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PostInitializeComponents()override;
 	void PlayFireMontage(bool bAiming);
-	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastHit();
 
 protected:
 
@@ -127,7 +125,15 @@ protected:
 	void AimOffset(float DeltaTime);
 
 	void PlayHitReactMontage();
-
+	UFUNCTION()
+	void ReceiveDamage(
+		AActor* DamagedActor,
+		float Damage,
+		UDamageType const* DamageType,
+		class AController* InstigatorController,
+		AActor* DamageCauser
+		);
+	void UpdateHUDHealth();
 protected:
 
 	/** Set up input action bindings */

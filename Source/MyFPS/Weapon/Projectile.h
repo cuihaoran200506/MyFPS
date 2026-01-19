@@ -35,6 +35,9 @@ protected:
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_PlayImpactEffects(FVector_NetQuantize Location, FVector_NetQuantize Normal);
 
+	UPROPERTY(EditAnywhere)
+	float Damage = 20.f;
+
 private:
 	UPROPERTY(VisibleAnywhere)
 	UBoxComponent* CollisionBox;

@@ -18,10 +18,10 @@
 void AMyFPSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	MyFPSPlayerController= Cast<AMyFPSPlayerController>(Controller);
-	if(MyFPSPlayerController)
+	UpdateHUDHealth();
+	if (HasAuthority())
 	{
-		MyFPSPlayerController->SetHUDHealth(Health, MaxHealth);
+		OnTakeAnyDamage.AddDynamic(this, &AMyFPSCharacter::ReceiveDamage);
 	}
 }
 
@@ -111,7 +111,6 @@ void AMyFPSCharacter::PostInitializeComponents()
 	if (Combat)
 	{
 		Combat->Character = this;
-
 	}
 }
 
@@ -153,6 +152,22 @@ void AMyFPSCharacter::PlayHitReactMontage()
 		AnimInstanceTP->Montage_Play(HitReactMontage);
 		FName SectionName("FromFront");
 		AnimInstanceFP->Montage_JumpToSection(SectionName);
+	}
+}
+
+void AMyFPSCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, UDamageType const* DamageType, AController* InstigatorController, AActor* DamageCauser)
+{
+	Health = FMath::Clamp(Health - Damage, 0.f, MaxHealth);
+	UpdateHUDHealth();
+	PlayHitReactMontage();
+}
+
+void AMyFPSCharacter::UpdateHUDHealth()
+{
+	MyFPSPlayerController = MyFPSPlayerController == nullptr ? Cast<AMyFPSPlayerController>(Controller) : MyFPSPlayerController;
+	if (MyFPSPlayerController)
+	{
+		MyFPSPlayerController->SetHUDHealth(Health, MaxHealth);
 	}
 }
 
@@ -208,13 +223,10 @@ void AMyFPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME(AMyFPSCharacter, Health);
 }
 
-void AMyFPSCharacter::MulticastHit_Implementation()
-{
-	PlayHitReactMontage();
-}
-
 void AMyFPSCharacter::OnRep_Health()
 {
+	UpdateHUDHealth();
+	PlayHitReactMontage();
 }
 
 void AMyFPSCharacter::SetOverlappingWeapon(AWeapon* Weapon)
