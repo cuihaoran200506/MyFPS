@@ -82,7 +82,10 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PostInitializeComponents()override;
 	void PlayFireMontage(bool bAiming);
-
+	void PlayElimMontage(bool bEquipped);
+	void Elim();
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastElim();
 protected:
 
 	/** Called from Input Actions for movement input */
@@ -139,6 +142,7 @@ protected:
 	/** Set up input action bindings */
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 
+	virtual void PossessedBy(AController* NewController) override;
 public:
 
 	/** Returns the first person mesh **/
@@ -167,7 +171,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	class UAnimMontage* FireWeaponMontage;
 	UPROPERTY(EditAnywhere, Category = "Combat")
-	class UAnimMontage* HitReactMontage;
+	UAnimMontage* HitReactMontage;
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	UAnimMontage* ElimMontage;
 
 	UPROPERTY(EditAnywhere, Category = "Player Stats")
 	float MaxHealth = 100.f;
@@ -177,6 +183,13 @@ private:
 	void OnRep_Health();
 
 	class AMyFPSPlayerController* MyFPSPlayerController;
+
+	bool bElimmed=false;
+	FTimerHandle ElimTimer;
+	UPROPERTY(EditDefaultsOnly)
+	float ElimDelay = 2.0f;
+	void ElimTimerFinished();
+
 public:
 
 	void SetOverlappingWeapon(AWeapon* Weapon);
@@ -194,4 +207,5 @@ public:
 	FVector GetHitTarget() const;
 
 	FORCEINLINE UCameraComponent* GetCamera() const { return FirstPersonCameraComponent; }
+	FORCEINLINE bool IsElimmed() const { return bElimmed; }
 };

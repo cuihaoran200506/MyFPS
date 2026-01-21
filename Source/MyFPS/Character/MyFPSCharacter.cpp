@@ -14,6 +14,8 @@
 #include "MyFPS/Weapon/Weapon.h"
 #include "MyFPS/Components/CombatComponent.h"
 #include "MyFPS/MyFPSPlayerController.h"
+#include "MyFPS/GameMode/MyFPSGameMode.h"
+#include "TimerManager.h"
 
 void AMyFPSCharacter::BeginPlay()
 {
@@ -135,6 +137,48 @@ void AMyFPSCharacter::PlayFireMontage(bool bAiming)
 	}
 }
 
+void AMyFPSCharacter::PlayElimMontage(bool bEquipped)
+{
+	UAnimInstance* AnimInstanceFP = FirstPersonMesh->GetAnimInstance();
+	UAnimInstance* AnimInstanceTP = GetMesh()->GetAnimInstance();
+	if (AnimInstanceFP && ElimMontage)
+	{
+		AnimInstanceFP->Montage_Play(ElimMontage);
+		FName SectionName;
+		SectionName = bEquipped ? FName("ArmedElim") : FName("UnarmedElim");
+		AnimInstanceFP->Montage_JumpToSection(SectionName);
+	}
+	if (AnimInstanceTP && ElimMontage)
+	{
+		AnimInstanceTP->Montage_Play(ElimMontage);
+		FName SectionName = bEquipped ? FName("ArmedElim") : FName("UnarmedElim");
+		AnimInstanceTP->Montage_JumpToSection(SectionName);
+	}
+}
+
+void AMyFPSCharacter::ElimTimerFinished()
+{
+	AMyFPSGameMode* MyFPSGameMode = GetWorld()->GetAuthGameMode<AMyFPSGameMode>();
+	if (MyFPSGameMode)
+	{
+		MyFPSGameMode->RequestRespawn(this, MyFPSPlayerController);
+	} 
+}
+
+void AMyFPSCharacter::Elim()
+{
+	if (GetWorldTimerManager().IsTimerActive(ElimTimer)) return;
+
+	MulticastElim();
+	GetWorld()->GetTimerManager().SetTimer(ElimTimer, this, &AMyFPSCharacter::ElimTimerFinished, ElimDelay);
+}
+
+void AMyFPSCharacter::MulticastElim_Implementation()
+{
+	bElimmed = true;
+	PlayElimMontage(Combat && Combat->EquippedWeapon);
+}
+
 void AMyFPSCharacter::PlayHitReactMontage()
 {
 	if (Combat == nullptr || Combat->EquippedWeapon == nullptr)return;
@@ -151,15 +195,29 @@ void AMyFPSCharacter::PlayHitReactMontage()
 	{
 		AnimInstanceTP->Montage_Play(HitReactMontage);
 		FName SectionName("FromFront");
-		AnimInstanceFP->Montage_JumpToSection(SectionName);
+		AnimInstanceTP->Montage_JumpToSection(SectionName);
 	}
 }
 
 void AMyFPSCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, UDamageType const* DamageType, AController* InstigatorController, AActor* DamageCauser)
 {
+	if (bElimmed) return;
 	Health = FMath::Clamp(Health - Damage, 0.f, MaxHealth);
 	UpdateHUDHealth();
-	PlayHitReactMontage();
+	if (Health > 0.f)
+	{
+		PlayHitReactMontage();
+	}
+	else 
+	{
+		AMyFPSGameMode* MyFPSGameMode = GetWorld()->GetAuthGameMode<AMyFPSGameMode>();
+		if (MyFPSGameMode)
+		{
+			MyFPSPlayerController = MyFPSPlayerController == nullptr ? Cast<AMyFPSPlayerController>(Controller) : MyFPSPlayerController;
+			AMyFPSPlayerController* AttackerController = Cast<AMyFPSPlayerController>(InstigatorController);
+			MyFPSGameMode->PlayerEliminated(this, MyFPSPlayerController, AttackerController);
+		}
+	}
 }
 
 void AMyFPSCharacter::UpdateHUDHealth()
@@ -203,6 +261,17 @@ void AMyFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	}
 }
 
+void AMyFPSCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	MyFPSPlayerController = Cast<AMyFPSPlayerController>(NewController);
+	if (MyFPSPlayerController)
+	{
+		MyFPSPlayerController->SetHUDHealth(Health, MaxHealth);
+	}
+}
+
 void AMyFPSCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
 {
 	if (OverlappingWeapon)
@@ -228,6 +297,7 @@ void AMyFPSCharacter::OnRep_Health()
 	UpdateHUDHealth();
 	PlayHitReactMontage();
 }
+
 
 void AMyFPSCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 {

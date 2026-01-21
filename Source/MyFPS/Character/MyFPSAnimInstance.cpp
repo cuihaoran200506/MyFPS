@@ -34,6 +34,7 @@ void UMyFPSAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	EquippedWeapon = MyFPSCharacter->GetEquippedWeapon();
 	bIsCrouched = MyFPSCharacter->bIsCrouched;
 	bAiming = MyFPSCharacter->IsAiming();
+	bElimmed = MyFPSCharacter->IsElimmed();
 
 	FRotator AimRotation = MyFPSCharacter->GetBaseAimRotation();
 	FRotator MovementRotation = UKismetMathLibrary::MakeRotFromX(MyFPSCharacter->GetVelocity());
